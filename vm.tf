@@ -49,6 +49,21 @@ resource "azurerm_windows_virtual_machine" "vm-lg-shirdfspike-filesource" {
   }
 }
 
+resource "azurerm_virtual_machine_extension" "vm_setup_script" {
+  name                 = "install_edge2"
+  virtual_machine_id   = azurerm_windows_virtual_machine.vm-lg-shirdfspike-filesource.id
+  publisher            = "Microsoft.Compute"
+  type                 = "CustomScriptExtension"
+  type_handler_version = "1.9"
+
+ protected_settings = <<PROT
+    {
+      "commandToExecute": "powershell -encodedCommand ${textencodebase64(file("setup.ps1"), "UTF-16LE")}"
+    }
+    PROT
+
+}
+
 resource "azurerm_public_ip" "pip-lg-shirdfspike-filesource" {
   name                = "pip-lg-shirdfspike-filesource"
   location            = azurerm_resource_group.rg-lg-shirdfspike.location

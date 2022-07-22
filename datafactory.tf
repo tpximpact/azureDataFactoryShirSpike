@@ -21,15 +21,24 @@ resource "azurerm_data_factory_linked_service_key_vault" "ls-adf-lg-shirdfspike-
     key_vault_id    = azurerm_key_vault.kv-lg-shirdfspike2.id
 }
 
-resource "azurerm_data_factory_linked_service_azure_file_storage" "ls-adf-lg-shirdfspike-storage-sink" {
+resource "azurerm_data_factory_linked_custom_service" "ls-adf-lg-shirdfspike-storage-sink" {
   name              = "ls-adf-lg-shirdfspike-sink"
   data_factory_id = azurerm_data_factory.adf-lg-shirdfspike.id
-  connection_string = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.st-lg-shirdfspike-sink.name};EndpointSuffix=core.windows.net;"
-  file_share = azurerm_storage_share.st-lg-shirdfspike-sink-share.name
-  key_vault_password {
-    linked_service_name = azurerm_data_factory_linked_service_key_vault.ls-adf-lg-shirdfspike-keyvault.name
-    secret_name = azurerm_key_vault_secret.vm-lg-shirdfspike-sink-access-key.name
-  }
+  type = "AzureFileStorage"
+    type_properties_json = <<JSON
+    {
+      "connectionString": "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.st-lg-shirdfspike-sink.name};EndpointSuffix=core.windows.net",
+      "fileShare": "${azurerm_storage_share.st-lg-shirdfspike-sink-share.name}",
+      "accountKey": { 
+          "type": "AzureKeyVaultSecret", 
+          "store": { 
+              "referenceName": "${azurerm_data_factory_linked_service_key_vault.ls-adf-lg-shirdfspike-keyvault.name}", 
+              "type": "LinkedServiceReference" 
+          }, 
+          "secretName": "${azurerm_key_vault_secret.vm-lg-shirdfspike-sink-access-key.name}" 
+      }
+    }
+    JSON  
 }
 
 resource "azurerm_data_factory_linked_custom_service" "ls-adf-lg-shirdfspike" {
@@ -83,16 +92,12 @@ resource "azurerm_data_factory_custom_dataset" "adfp-lg-shirdfspike-sink" {
   type            = "Binary"
 
   linked_service {
-    name = azurerm_data_factory_linked_service_azure_file_storage.ls-adf-lg-shirdfspike-storage-sink.name
+    name = azurerm_data_factory_linked_custom_service.ls-adf-lg-shirdfspike-storage-sink.name
   }
 
   type_properties_json = <<JSON
     {
-        "location": {
-            "container":"${azurerm_storage_container.st-lg-shirdfspike-sink-container.name}",
-            "folderPath": "/",
-            "type":"AzureFileStorageLocation"
-        }
+
     }
 JSON
 }

@@ -7,12 +7,6 @@ resource "azurerm_storage_account" "st-lg-shirdfspike-sink" {
   account_replication_type = "LRS"
 }
 
-resource "azurerm_storage_container" "st-lg-shirdfspike-sink-container" {
-  name                  = "sink-container"
-  storage_account_name = azurerm_storage_account.st-lg-shirdfspike-sink.name
-  container_access_type = "private"
-}
-
 resource "azurerm_storage_share" "st-lg-shirdfspike-sink-share" {
   name                 = "share-sink"
   storage_account_name = azurerm_storage_account.st-lg-shirdfspike-sink.name
