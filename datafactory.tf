@@ -97,7 +97,10 @@ resource "azurerm_data_factory_custom_dataset" "adfp-lg-shirdfspike-sink" {
 
   type_properties_json = <<JSON
     {
-
+        "location": {
+            "folderPath": "/",
+            "type":"AzureFileStorageLocation"
+        }
     }
 JSON
 }
