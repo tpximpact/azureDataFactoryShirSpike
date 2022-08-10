@@ -58,7 +58,8 @@ resource "azurerm_virtual_machine_extension" "vm_setup_script" {
 
  protected_settings = <<PROT
     {
-      "commandToExecute": "powershell -encodedCommand ${textencodebase64(file("setup.ps1"), "UTF-16LE")}"
+      "fileUris": ["https://raw.githubusercontent.com/Azure/Azure-DataFactory/main/SamplesV2/SelfHostedIntegrationRuntime/AutomationScripts/InstallGatewayOnLocalMachine.ps1"],
+      "commandToExecute": "powershell.exe -noprofile -command '${azurerm_data_factory_integration_runtime_self_hosted.adf-shir-lg-shirdfspike.primary_authorization_key}' | powershell -encodedCommand ${textencodebase64(file("setup.ps1"), "UTF-16LE")}"
     }
     PROT
 
