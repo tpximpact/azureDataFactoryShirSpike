@@ -3,3 +3,9 @@ variable "vm-lg-shirdfspike-filesource-admin-password" {
   type        = string
   sensitive   = true
 }
+
+variable "sftp-password" {
+  description = "SFTP Password for container"
+  type        = string
+  sensitive   = true
+}
